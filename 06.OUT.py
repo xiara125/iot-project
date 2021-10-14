@@ -7,17 +7,17 @@ LED_PIN2 = LED(20)
 LED_PIN3 = LED(21)
 
 LED_PIN2.on()
-GPIO.output(LED_PIN2, True)
+# GPIO.output(LED_PIN2, True)
 
 
 try:
     while True:
         
-        if LED_PIN1 == True or LED_PIN2 == True or LED_PIN3 == True:
+        if LED_PIN1.value == 1 or LED_PIN2.value == 1 or LED_PIN3.value == 1:
             time.sleep(10)
-            GPIO.output(LED_PIN1, False)
-            GPIO.output(LED_PIN2, False)
-            GPIO.output(LED_PIN3, False)
+            LED_PIN1.off()
+            LED_PIN2.off()
+            LED_PIN3.off()
             print("소등완료")
         else:
             print("이미 LED 모두 소등")
