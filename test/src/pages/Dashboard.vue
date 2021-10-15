@@ -34,7 +34,7 @@
           </div>
         </card>
       </div>
-      <div class="col-8">
+      <div class="col-8" >
         <card style="height: 677px; font-size : 40px" class="text-center">
           <div class="row" style="margin-top:200px">
             <div class="col-4">
@@ -51,7 +51,7 @@
           </div>
           <div class="row" style="margin-top:100px">
             <div class="col-4">
-              <i slot="title" class="tim-icons icon-light-3"></i>
+              <i slot="title" class="tim-icons icon-light-3" @mousedown="callSTT()"></i>
             </div>
             <div class="col-4">
               <i slot="title" class="tim-icons icon-time-alarm"></i>
@@ -129,13 +129,15 @@
   let now = new Date()
   let prehour = now.getHours()<10 ? `0${now.getHours()}` : now.getHours()
   let premin = now.getMinutes()<10 ? `0${now.getMinutes()}` : now.getMinutes()
+  
   export default {
     components: {
       LineChart,
       BarChart,
       TaskList,
       UserTable,
-      BaseAlert
+      BaseAlert,
+      
     },
     data() {
       return {
@@ -152,11 +154,11 @@
           min : premin,
         },
         sensors:{
-          'Room':{
-            'temp': 24,
-            'humi': 60,
-            'illu': 80,
-          },
+          // Room:{
+          //   'temp': '',
+          //   'humi': '',
+          //   // 'illu': '',
+          // },
         },
         bigLineChart: {
           allData: [
@@ -292,6 +294,14 @@
         this.$mqtt.publish('iot/hong/control/elevator','5')
         console.log()
       },
+      callSTT(){
+        this.$mqtt.publish('iot/hong/STT','call')
+        console.log()
+      },
+      callDHT(){
+        this.$mqtt.publish('iot/hong/control/elevator','0')
+        console.log()
+      },
       toggleSidebar() {
         this.$sidebar.displaySidebar(!this.$sidebar.showSidebar);
       },
@@ -321,12 +331,6 @@
     },
     mqtt: {
         'iot/hong/floor/elevator': function(value,topic) {
-            // let [,,,place,device] = topic.split('/')
-            // // 처음 인식된 장소면 빈 객체 추가
-            // !this.sensors[place] && (this.sensors[place] = {})
-            // this.sensors[place][device] = value
-            
-            // this.sensors={ ...this.sensors  }
             let [,,,ele] = topic.split('/')
             console.log(ele)
             console.log(value-'0')
@@ -334,12 +338,6 @@
             
         },
         'iot/hong/arrive/elevator': function(value,topic) {
-            // let [,,,place,device] = topic.split('/')
-            // // 처음 인식된 장소면 빈 객체 추가
-            // !this.sensors[place] && (this.sensors[place] = {})
-            // this.sensors[place][device] = value
-            
-            // this.sensors={ ...this.sensors  }
             let [,,,ele] = topic.split('/')
             console.log(ele)
             if (value == 1){
@@ -350,15 +348,22 @@
             // this.elevator.floor = value
         },
         'iot/hong/interphone': function(value,topic) {
-            let [,,,ele] = topic.split('/')
-            console.log(ele)
+            // console.log(topic)
             if (value == 0){
               console.log('종료')
               // window.alert('도착!!')
               this.notifyVue('top','center',End)
             }
             // this.elevator.floor = value
-        }
+        },
+        'iot/sensors/#': function(value, topic) {
+            let [,,place,device] = topic.split('/')
+            // // 처음 인식된 장소면 빈 객체 추가
+            !this.sensors[place] && (this.sensors[place] = {})
+            this.sensors[place][device] = value
+            this.sensors={ ...this.sensors  }
+            console.log(device)
+        },
     },
     mounted() {
       this.i18n = this.$i18n;
@@ -372,17 +377,22 @@
       this.$mqtt.subscribe('iot/hong/floor/elevator')
       this.$mqtt.subscribe('iot/hong/arrive/elevator')
       this.$mqtt.subscribe('iot/hong/interphone')
+      this.$mqtt.subscribe('iot/sensors/#')
 
       if(this.min<10){
         this.min = `0${this.min}`
       }
 
       setInterval(this.getClock,1000)
+      setTimeout(this.callDHT,100)
       
     },
     unmounted() {
         // 구독 해제
         this.$mqtt.unsubscribe('iot/hong/floor/elevator')
+        this.$mqtt.subscribe('iot/hong/arrive/elevator')
+        this.$mqtt.subscribe('iot/hong/interphone')
+        this.$mqtt.subscribe('iot/sensors/#')
     },
     beforeDestroy() {
       if (this.$rtl.isRTL) {

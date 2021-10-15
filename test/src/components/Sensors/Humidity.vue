@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="text-center">
       <!-- <v-icon x-large class="mr-3 float-left" 
             :color="color">{{icon}}</v-icon> -->
         <div class="font-weight-bold">습도</div>
