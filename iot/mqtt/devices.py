@@ -3,7 +3,9 @@ from mqtt import add_topic_handler
 from gpiozero import AngularServo
 from gpiozero.pins.pigpio import PiGPIOFactory
 from .car import Car
-from audiotest.main import start
+from audiotest.main import start,mqttSTT
+from audiotest.kakaoSound import play_elevator
+import threading
 
 import paho.mqtt.client as mqtt
 interphone = mqtt.Client()
@@ -40,3 +42,19 @@ def call_interphone(topic, value):
         interphone.publish("iot/hong/interphone",'0')
 
 add_topic_handler('interphone',call_interphone)
+
+
+def call_elevator(topic, value):
+    if value == '1':
+        play_elevator()
+
+add_topic_handler('arrive/elevator',call_elevator)
+
+
+def call_STT(topic, value):
+    if value == 'call':
+        my_thread = threading.Thread(target=mqttSTT)
+        my_thread.start()
+        
+
+add_topic_handler('STT',call_STT)
