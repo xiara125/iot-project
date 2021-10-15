@@ -3,13 +3,6 @@ import io
 from pydub import AudioSegment
 from pydub.playback import play
 
-cast = weather.get_weather()
-# print(cast)
-
-audio_cast = f"오늘 날씨는 {cast['description']} 입니다. "
-audio_cast += f",현재 기온은 {round(cast['etc']['temp']-273.15)}도, 습도는 {round(cast['etc']['humidity'])} percent입니다."
-
-# print(audio_cast)
 
 URL = "https://kakaoi-newtone-openapi.kakao.com/v1/synthesize"
 HEADERS = {
@@ -36,10 +29,18 @@ def play_audio(audio):
     play(song)
 
 def play_weather():
+    cast = weather.get_weather()
+    audio_cast = f"오늘 날씨는 {cast['description']} 입니다. "
+    audio_cast += f",현재 기온은 {round(cast['etc']['temp']-273.15)}도, 습도는 {round(cast['etc']['humidity'])} percent입니다."
     audio = synthesize(audio_cast)
     play_audio(audio)
 
 def play_default():
     text = "명령을 이해하지 못했습니다. 다시 알려주세요"
+    audio = synthesize(text)
+    play_audio(audio)
+
+def play_elevator():
+    text = "엘리베이터가 도착했습니다"
     audio = synthesize(text)
     play_audio(audio)

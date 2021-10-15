@@ -1,7 +1,7 @@
 from re import S
 from gpiozero import AngularServo, LED
 from gpiozero.pins.pigpio import PiGPIOFactory
-from . import weather_info as wi
+from . import kakaoSound as ks
 import paho.mqtt.client as mqtt
 from time import sleep
 
@@ -41,7 +41,7 @@ class Cmd:
         self.led.off()
 
     def weather(self):
-        wi.play_weather()
+        ks.play_weather()
 
     def elevator(self):
         try:
@@ -63,5 +63,5 @@ class Cmd:
             method = getattr(self,method_name)
             method()
         else:
-            wi.play_default()
+            ks.play_default()
             
