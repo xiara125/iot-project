@@ -125,6 +125,7 @@
   import { BaseAlert } from '@/components';
   import End from './Notifications/End.vue';
   import Start from './Notifications/Start.vue';
+  import EarthShake from './Notifications/EarthShake.vue';
 
   let now = new Date()
   let prehour = now.getHours()<10 ? `0${now.getHours()}` : now.getHours()
@@ -364,6 +365,13 @@
             this.sensors={ ...this.sensors  }
             console.log(device)
         },
+        'iot/earthshake': function(value, topic) {
+            if (value == 1){
+              console.log('지진발생')
+              this.notifyVue('top','center',EarthShake)
+            }
+            // console.log(topic,value)
+        },
     },
     mounted() {
       this.i18n = this.$i18n;
@@ -378,6 +386,7 @@
       this.$mqtt.subscribe('iot/hong/arrive/elevator')
       this.$mqtt.subscribe('iot/hong/interphone')
       this.$mqtt.subscribe('iot/sensors/#')
+      this.$mqtt.subscribe('iot/earthshake')
 
       if(this.min<10){
         this.min = `0${this.min}`
