@@ -63,7 +63,7 @@
         </card>
       </div>
     </div>
-    <!-- <div class="row">
+    <div class="row">
       <div class="col-lg-4" :class="{'text-right': isRTL}">
         <card type="chart">
           <template slot="header">
@@ -81,7 +81,7 @@
         </card>
       </div>
     </div>
-    <div class="row">
+    <!-- <div class="row">
       <div class="col-lg-6 col-md-12">
         <card type="tasks" :header-classes="{'text-right': isRTL}">
           <template slot="header">
@@ -146,6 +146,7 @@
         notifications: {
           topCenter: false
         },
+        arytemp:[],
         elevator:{
           floor:'',
           arrive:0
@@ -204,6 +205,7 @@
         greenLineChart: {
           extraOptions: chartConfigs.greenChartOptions,
           chartData: {
+            now_temp : '',
             labels: ['JUL', 'AUG', 'SEP', 'OCT', 'NOV'],
             datasets: [{
               label: "My First dataset",
@@ -219,7 +221,7 @@
               pointHoverRadius: 4,
               pointHoverBorderWidth: 15,
               pointRadius: 4,
-              data: [90, 27, 60, 12, 80],
+              data: ['20', '27', '30', '42',''],
             }]
           },
           gradientColors: ['rgba(66,134,121,0.15)', 'rgba(66,134,121,0.0)', 'rgba(66,134,121,0)'],
@@ -257,6 +259,9 @@
       
     },
     methods: {
+      updateChart(){
+
+      },
       notifyVue(verticalAlign, horizontalAlign,component) {
         const color = Math.floor(Math.random() * 4 + 1);
         this.$notify({
@@ -301,6 +306,7 @@
       },
       callDHT(){
         this.$mqtt.publish('iot/hong/control/elevator','0')
+        this.$mqtt.publish('iot/hong/call/illu','call')
         console.log()
       },
       toggleSidebar() {
@@ -363,7 +369,14 @@
             !this.sensors[place] && (this.sensors[place] = {})
             this.sensors[place][device] = value
             this.sensors={ ...this.sensors  }
-            console.log(device)
+            // console.log(device,value-'0')
+            // console.log(this.greenLineChart.chartData.datasets[0].data[4])
+            // this.greenLineChart.chartData.datasets[0].data[4] = this.sensors[place].temp-'0'
+            // this.greenLineChart = {...this.greenLineChart}
+            // this.arytemp.push(this.sensors[place].temp-'0')
+            // console.log(this.arytemp)
+
+
         },
         'iot/earthshake': function(value, topic) {
             if (value == 1){

@@ -3,7 +3,7 @@
         <!-- <v-icon x-large class="mr-3 float-left" 
             :color="color">mdi-brightness-7</v-icon> -->
         <div  class="font-weight-bold">조도</div>
-        <span>{{value}}</span>
+        <span>{{value}}lx</span>
     </div>
 
 </template>

@@ -103,16 +103,16 @@ export default {
             icon : `http://openweathermap.org/img/w/${data.current.weather[0].icon}.png`
         }
         this.weather.tomorrow ={
-            main: data.daily[0].weather[0].description,
-            min_temp: data.daily[0].temp.min,
-            max_temp: data.daily[0].temp.max,
-            icon : `http://openweathermap.org/img/w/${data.daily[0].weather[0].icon}.png`
-        }
-        this.weather.da_tomorrow ={
             main: data.daily[1].weather[0].description,
             min_temp: data.daily[1].temp.min,
             max_temp: data.daily[1].temp.max,
             icon : `http://openweathermap.org/img/w/${data.daily[1].weather[0].icon}.png`
+        }
+        this.weather.da_tomorrow ={
+            main: data.daily[2].weather[0].description,
+            min_temp: data.daily[2].temp.min,
+            max_temp: data.daily[2].temp.max,
+            icon : `http://openweathermap.org/img/w/${data.daily[2].weather[0].icon}.png`
         }
         console.log(this.weather.today.temp)
         
