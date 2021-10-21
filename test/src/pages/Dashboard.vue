@@ -57,7 +57,7 @@
               <i slot="title" class="tim-icons icon-time-alarm"></i>
             </div>
             <div class="col-4">
-              <i slot="title" class="tim-icons icon-video-66"></i>
+              <i slot="title" class="tim-icons icon-video-66" @click="searchModalVisible = true"></i>
             </div>
           </div>
         </card>
@@ -81,6 +81,33 @@
         </card>
       </div>
     </div>
+    
+    <div @click="searchModalVisible=true, timeCheck()">
+      <!-- <input type="text" class="form-control" placeholder="Search...">
+      <div class="input-group-addon"><i class="tim-icons icon-zoom-split"></i></div> -->
+      <base-button data-toggle="modal">
+        modal button
+      </base-button>
+      <!-- You can choose types of search input -->
+    </div>
+    <modal :show.sync="searchModalVisible"
+      
+      id="searchModal"
+      :centered="false"
+      :show-close="true">
+      <template slot="header">
+        <h2 class="modal-title">제목</h2>
+      </template>
+
+      <!-- <h6 slot="header" class="modal-title" id="modal-title-default">Type your modal title</h6> -->
+    <div>
+      <img :src="streamurl" class="mjpeg" />
+    </div>
+        <base-button @click="searchModalVisible=false">닫기</base-button>
+        <base-button @click="opendoor()">문 열기</base-button>
+        <base-button @click="closedoor()">문 닫기</base-button>
+    </modal>
+    
     <!-- <div class="row">
       <div class="col-lg-6 col-md-12">
         <card type="tasks" :header-classes="{'text-right': isRTL}">
@@ -126,6 +153,7 @@
   import End from './Notifications/End.vue';
   import Start from './Notifications/Start.vue';
   import EarthShake from './Notifications/EarthShake.vue';
+  import Modal from '@/components/Modal';
 
   let now = new Date()
   let prehour = now.getHours()<10 ? `0${now.getHours()}` : now.getHours()
@@ -138,10 +166,16 @@
       TaskList,
       UserTable,
       BaseAlert,
+      Modal,
       
     },
     data() {
       return {
+        streamurl : 'http://192.168.35.71:8000/mjpeg/stream/',
+        activeNotifications: false,
+        showMenu: false,
+        searchModalVisible: false,
+        searchQuery: '',
         type: ["", "info", "success", "warning", "danger"],
         notifications: {
           topCenter: false
@@ -205,7 +239,6 @@
         greenLineChart: {
           extraOptions: chartConfigs.greenChartOptions,
           chartData: {
-            now_temp : '',
             labels: ['JUL', 'AUG', 'SEP', 'OCT', 'NOV'],
             datasets: [{
               label: "My First dataset",
@@ -221,7 +254,8 @@
               pointHoverRadius: 4,
               pointHoverBorderWidth: 15,
               pointRadius: 4,
-              data: ['20', '27', '30', '42',''],
+              // data: this.arytemp,
+              data: [],
             }]
           },
           gradientColors: ['rgba(66,134,121,0.15)', 'rgba(66,134,121,0.0)', 'rgba(66,134,121,0)'],
@@ -259,7 +293,27 @@
       
     },
     methods: {
+      timeCheck(){
+        // setTimeout(this.timeout,5000)
+        setTimeout(this.timeout,5000)
+      },
+      timeout(){
+        this.searchModalVisible=false
+      },
+      consoleTest(){
+        console.log('테스트')
+      },
+      opendoor(){
+        this.$mqtt.publish('iot/hong/door','open')
+      },
+      closedoor(){
+        this.$mqtt.publish('iot/hong/door','close')
+      },
       updateChart(){
+        // this.greenLineChart.chartData.datasets[0].data = this.arytemp.slice(0,5)
+        console.log(this.greenLineChart.chartData.datasets[0].data)
+        // console.log(this.arytemp.slice(0,5))
+        // this.greenLineChart.chartData.datasets[0].data.push(10)
 
       },
       notifyVue(verticalAlign, horizontalAlign,component) {
@@ -373,10 +427,25 @@
             // console.log(this.greenLineChart.chartData.datasets[0].data[4])
             // this.greenLineChart.chartData.datasets[0].data[4] = this.sensors[place].temp-'0'
             // this.greenLineChart = {...this.greenLineChart}
-            // this.arytemp.push(this.sensors[place].temp-'0')
-            // console.log(this.arytemp)
+            if(device == 'temp'){
+              if(this.arytemp.length ==5){
+                this.arytemp.shift()
+                this.arytemp.push(this.sensors[place].temp-'0')  
+              }
+              else{
+                this.arytemp.push(this.sensors[place].temp-'0')
+              }
 
+              // this.arytemp.push(this.sensors[place].temp-'0')
+              // console.log(this.arytemp.length)
+              // console.log(this.arytemp)
+              // this.greenLineChart.chartData.datasets.data = this.arytemp.slice(0,5)
 
+              // console.log(this.greenLineChart.chartData.datasets[0].data)
+              // console.log('온도데이터',this.arytemp.slice(0,5))
+              this.greenLineChart.chartData.datasets[0].data.push(this.sensors[place].temp-'0')
+              
+            }
         },
         'iot/earthshake': function(value, topic) {
             if (value == 1){
@@ -407,7 +476,7 @@
 
       setInterval(this.getClock,1000)
       setTimeout(this.callDHT,100)
-      
+      setInterval(this.updateChart,3000)
     },
     unmounted() {
         // 구독 해제
