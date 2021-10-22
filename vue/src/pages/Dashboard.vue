@@ -18,11 +18,11 @@
           </div>
         </card>
         <card>
-          <weather city="seoul" cityTitle="서울"></weather>
+          <weather city="seoul" cityTitle="Seoul"></weather>
         </card>
         <card>
           <div v-for="(devices,place) in sensors" :key="place">
-            <h3>{{place}}</h3>
+            <h3 style="color :rgba(85, 95, 126, 1);font-weight:bold">{{place}}</h3>
             <div class="row">  
               <div class="col-4"
                 v-for="(value, device) in devices" :key="device">
@@ -36,33 +36,78 @@
       </div>
       <div class="col-8" >
         <card style="height: 677px; font-size : 40px" class="text-center">
-          <div class="row" style="margin-top:200px">
-            <div class="col-4">
-              <router-link :to="{path:'/icons'}"><i class="tim-icons icon-chat-33"></i></router-link>
-            </div>
-            <div class="col-4">
-                <i slot="title" class="tim-icons icon-bell-55" @click="callElevator()"></i> 
-                <br>{{elevator.floor}}
-            </div>
-            <div class="col-4">
+          <div class="row" style="margin-top:130px">
+            <div class="col-4" style="height: 50px">
+              <!-- <router-link :to="{path:'/icons'}"><i class="tim-icons icon-chat-33"></i></router-link> -->
+              <span class="material-icons md-inactive md-dark" style="font-size:60px"  v-on:click="kitchenLight"  v-if="kState==false"   >light</span>
+              <span class="material-icons " style="font-size:60px"  v-on:click="kitchenLight"  v-if="kState==true"   >light</span>
+              <!-- <span  style="line-height:1px"><br></span> -->
+              <div class="mt-0" style="line-height:10px">
+                <span class="room" sytle="opacity:0.2">Kitchen</span>
+              </div>
               
+            </div>
+            <div class="col-4">
+                <span class="material-icons md-inactive md-dark" style="font-size:60px"  v-on:click="livingRoomLight"  v-if="lState==false"   >light</span>
+                <span class="material-icons " style="font-size:60px"  v-on:click="livingRoomLight"  v-if="lState==true"   >light</span>
+                <div class="mt-0" style="line-height:10px">
+                <span class="room" sytle="opacity:0.2">LivingRoom</span>
+              </div>
+            </div>
+            <div class="col-4">
+              <!-- {{msg1}}
+              <button v-on:click="bbq">hey</button>
               <i slot="title" class="tim-icons icon-button-power" @click="callInterphone()"></i>
+              <span v-if="textState==false"><i slot="title" class="tim-icons icon-button-power" @click="callInterphone()"></i></span>
+              <span v-else-if="textState==true"><i class="fas fa-microphone" @click="speechToText=true, timeCheck(6000),callSTT()"></i></span> -->
+              <span class="material-icons md-inactive md-dark" style="font-size:60px"  v-on:click="bedRoomLight"  v-if="bState==false"   >light</span>
+              <span class="material-icons " style="font-size:60px"  v-on:click="bedRoomLight"  v-if="bState==true"   >light</span>
+              <div class="mt-0" style="line-height:10px">
+                <span class="room" sytle="opacity:0.2">BedRoom</span>
+              </div>
+
+            </div>
+          </div>
+          <div class="row" style="margin-top:100px">
+            <div class="col-4" style="height: 50px">
+              <div class="myicon">
+                <span class="material-icons" style="font-size:60px">flash_off</span>
+              </div>
+              
+            </div>
+            <div class="col-4" style="height: 50px">
+              <div class="myicon">
+              <span class="material-icons" style="font-size:60px" @click="callElevator()">elevator</span>
+                <!-- <i slot="title" class="tim-icons icon-bell-55" @click="callElevator()"></i>  -->
+                <div class="mt-0" style="line-height:10px;">
+                <span style="font-size:35px">{{elevator.floor}}</span>
+              </div>
+                </div>
+            </div>
+            <div class="col-4">
+              <div class="myicon">
+              <!-- <i slot="title" class="tim-icons icon-video-66" @click="searchModalVisible = true"></i> -->
+              <span class="material-icons" style="font-size:60px" @click="searchModalVisible = true">videocam</span>
+              </div>
             </div>
           </div>
           <div class="row" style="margin-top:100px">
             <div class="col-4">
-              <i slot="title" class="tim-icons icon-light-3" @mousedown="callSTT()"></i>
+              
             </div>
             <div class="col-4">
-              <i slot="title" class="tim-icons icon-time-alarm"></i>
+              <div class="myicon">
+              <i class="fas fa-microphone" @click="speechToText=true, timeCheck(6000),callSTT()"></i></div>
             </div>
             <div class="col-4">
-              <i slot="title" class="tim-icons icon-video-66" @click="searchModalVisible = true"></i>
+              
             </div>
           </div>
         </card>
       </div>
     </div>
+
+    
     <div class="row">
       <div class="col-lg-4" :class="{'text-right': isRTL}">
         <card type="chart">
@@ -82,21 +127,14 @@
       </div>
     </div>
     
-    <div @click="searchModalVisible=true, timeCheck()">
-      <!-- <input type="text" class="form-control" placeholder="Search...">
-      <div class="input-group-addon"><i class="tim-icons icon-zoom-split"></i></div> -->
-      <base-button data-toggle="modal">
-        modal button
-      </base-button>
-      <!-- You can choose types of search input -->
-    </div>
+    
     <modal :show.sync="searchModalVisible"
       
       id="searchModal"
       :centered="false"
       :show-close="true">
       <template slot="header">
-        <h2 class="modal-title">제목</h2>
+        <h2 class="modal-title">Camera</h2>
       </template>
 
       <!-- <h6 slot="header" class="modal-title" id="modal-title-default">Type your modal title</h6> -->
@@ -106,6 +144,21 @@
         <base-button @click="searchModalVisible=false">닫기</base-button>
         <base-button @click="opendoor()">문 열기</base-button>
         <base-button @click="closedoor()">문 닫기</base-button>
+        <base-button @click="faceCap()">얼굴 인식</base-button>
+    </modal>
+
+    <modal :show.sync="speechToText"
+      
+      id="sttModal"
+      :centered="false"
+      :show-close="true"
+      :duration="3000">
+      <template slot="header">
+        <h2 class="modal-title">음성인식</h2>
+      </template>
+      <div>
+        음성인식 중
+      </div>
     </modal>
     
     <!-- <div class="row">
@@ -154,6 +207,10 @@
   import Start from './Notifications/Start.vue';
   import EarthShake from './Notifications/EarthShake.vue';
   import Modal from '@/components/Modal';
+  import Open from './Notifications/Open.vue';
+  import Close from './Notifications/Close.vue';
+  import basic from './Notifications/basic.vue';
+
 
   let now = new Date()
   let prehour = now.getHours()<10 ? `0${now.getHours()}` : now.getHours()
@@ -171,7 +228,12 @@
     },
     data() {
       return {
+        textState:false,
+        kState:false,
+        lState:false,
+        bState:false,
         streamurl : 'http://192.168.35.71:8000/mjpeg/stream/',
+        speechToText: false,
         activeNotifications: false,
         showMenu: false,
         searchModalVisible: false,
@@ -293,12 +355,40 @@
       
     },
     methods: {
-      timeCheck(){
+      kitchenLight(){
+        if (this.kState==true){
+          this.kState = false
+        }
+        else{
+          this.kState = true
+        }
+      },
+      livingRoomLight(){
+        if (this.lState==true){
+          this.lState = false
+        }
+        else{
+          this.lState = true
+        }
+      },
+      bedRoomLight(){
+        if (this.bState==true){
+          this.bState = false
+        }
+        else{
+          this.bState = true
+        }
+      },
+      faceCap(){
+        this.$mqtt.publish('iot/hong/face/capture','face1')
+      },
+      timeCheck(time){
         // setTimeout(this.timeout,5000)
-        setTimeout(this.timeout,5000)
+        setTimeout(this.timeout,time)
       },
       timeout(){
         this.searchModalVisible=false
+        this.speechToText=false
       },
       consoleTest(){
         console.log('테스트')
@@ -311,7 +401,7 @@
       },
       updateChart(){
         // this.greenLineChart.chartData.datasets[0].data = this.arytemp.slice(0,5)
-        console.log(this.greenLineChart.chartData.datasets[0].data)
+        // console.log(this.greenLineChart.chartData.datasets[0].data)
         // console.log(this.arytemp.slice(0,5))
         // this.greenLineChart.chartData.datasets[0].data.push(10)
 
@@ -454,6 +544,17 @@
             }
             // console.log(topic,value)
         },
+        'iot/face/check': function(value, topic) {
+            if (value == 'open'){
+              console.log('open')
+              this.notifyVue('top','center',Open)
+            }
+            else if(value =='close'){
+              console.log('close')
+              this.notifyVue('top','center',Close)
+            }
+        },
+        
     },
     mounted() {
       this.i18n = this.$i18n;
@@ -469,6 +570,10 @@
       this.$mqtt.subscribe('iot/hong/interphone')
       this.$mqtt.subscribe('iot/sensors/#')
       this.$mqtt.subscribe('iot/earthshake')
+      this.$mqtt.subscribe('iot/face/check')
+      
+      
+      
 
       if(this.min<10){
         this.min = `0${this.min}`
@@ -515,5 +620,20 @@
   padding-top: 0px;
   padding-bottom: 0px;
 }
+.material-icons.md-dark { color: rgba(0, 0, 0, 0.54); }
+.material-icons.md-dark.md-inactive { color: rgba(0, 0, 0, 0.26); }
 
+.material-icons.md-light { color: rgba(255, 255, 255, 1); }
+.material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
+
+.room{
+  color :rgba(85, 95, 126, 1);
+  
+  font-size:20px;
+  
+}
+.myicon:active{
+   color :rgba(27, 27, 46, 1);
+
+}
 </style>

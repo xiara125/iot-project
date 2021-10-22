@@ -1,7 +1,8 @@
 <template>
   <div class="mt-1">
-      <div class="pl-3 text-left">
-          <span style="font-size:20px; font-weight:bold">{{cityTitle}}</span>
+      <div class=" text-left">
+          <!-- <span style="font-size:25px; font-weight:bold">{{cityTitle}}</span> -->
+          <h3 class="mb-0" style="color :rgba(85, 95, 126, 1);font-weight:bold;">{{cityTitle}}</h3>
           <!-- <img :src="icon" >{{weather.description}} -->
       </div>
       <div class="row" style="text-align:center">
