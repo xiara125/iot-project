@@ -10,7 +10,7 @@
               </div>
             </div>
           </template>
-          <div  class="hour">
+          <div  class="hour" @click="hourState()">
             {{clock.hour}}
           </div>
           <div class="min">
@@ -39,8 +39,8 @@
           <div class="row" style="margin-top:130px">
             <div class="col-4" style="height: 50px">
               <!-- <router-link :to="{path:'/icons'}"><i class="tim-icons icon-chat-33"></i></router-link> -->
-              <span class="material-icons md-inactive md-dark" style="font-size:60px"  v-on:click="kitchenLight"  v-if="kState==false"   >light</span>
-              <span class="material-icons " style="font-size:60px"  v-on:click="kitchenLight"  v-if="kState==true"   >light</span>
+              <span class="material-icons md-inactive md-dark" style="font-size:60px" v-on:click="kitchenLight" v-if="kState==false">light</span>
+              <span class="material-icons " style="font-size:60px"  v-on:click="kitchenLight" v-if="kState==true">light</span>
               <!-- <span  style="line-height:1px"><br></span> -->
               <div class="mt-0" style="line-height:10px">
                 <span class="room" sytle="opacity:0.2">Kitchen</span>
@@ -48,20 +48,15 @@
               
             </div>
             <div class="col-4">
-                <span class="material-icons md-inactive md-dark" style="font-size:60px"  v-on:click="livingRoomLight"  v-if="lState==false"   >light</span>
-                <span class="material-icons " style="font-size:60px"  v-on:click="livingRoomLight"  v-if="lState==true"   >light</span>
+                <span class="material-icons md-inactive md-dark" style="font-size:60px" v-on:click="livingRoomLight" v-if="lState==false">light</span>
+                <span class="material-icons " style="font-size:60px"  v-on:click="livingRoomLight" v-if="lState==true">light</span>
                 <div class="mt-0" style="line-height:10px">
                 <span class="room" sytle="opacity:0.2">LivingRoom</span>
               </div>
             </div>
             <div class="col-4">
-              <!-- {{msg1}}
-              <button v-on:click="bbq">hey</button>
-              <i slot="title" class="tim-icons icon-button-power" @click="callInterphone()"></i>
-              <span v-if="textState==false"><i slot="title" class="tim-icons icon-button-power" @click="callInterphone()"></i></span>
-              <span v-else-if="textState==true"><i class="fas fa-microphone" @click="speechToText=true, timeCheck(6000),callSTT()"></i></span> -->
-              <span class="material-icons md-inactive md-dark" style="font-size:60px"  v-on:click="bedRoomLight"  v-if="bState==false"   >light</span>
-              <span class="material-icons " style="font-size:60px"  v-on:click="bedRoomLight"  v-if="bState==true"   >light</span>
+              <span class="material-icons md-inactive md-dark" style="font-size:60px" v-on:click="bedRoomLight" v-if="bState==false">light</span>
+              <span class="material-icons " style="font-size:60px"  v-on:click="bedRoomLight" v-if="bState==true">light</span>
               <div class="mt-0" style="line-height:10px">
                 <span class="room" sytle="opacity:0.2">BedRoom</span>
               </div>
@@ -78,7 +73,6 @@
             <div class="col-4" style="height: 50px">
               <div class="myicon">
               <span class="material-icons" style="font-size:60px" @click="callElevator()">elevator</span>
-                <!-- <i slot="title" class="tim-icons icon-bell-55" @click="callElevator()"></i>  -->
                 <div class="mt-0" style="line-height:10px;">
                 <span style="font-size:35px">{{elevator.floor}}</span>
               </div>
@@ -86,7 +80,6 @@
             </div>
             <div class="col-4">
               <div class="myicon">
-              <!-- <i slot="title" class="tim-icons icon-video-66" @click="searchModalVisible = true"></i> -->
               <span class="material-icons" style="font-size:60px" @click="searchModalVisible = true">videocam</span>
               </div>
             </div>
@@ -228,10 +221,10 @@
     },
     data() {
       return {
-        textState:false,
-        kState:false,
-        lState:false,
-        bState:false,
+        hState:false,   // 시간 표시 상태
+        kState:false,   // kitchen led on/off
+        lState:false,   // livingRoom led on/off
+        bState:false,   // bedRoom led on/off
         streamurl : 'http://192.168.35.71:8000/mjpeg/stream/',
         speechToText: false,
         activeNotifications: false,
@@ -355,6 +348,10 @@
       
     },
     methods: {
+      hourState(){
+        this.hState==true ? this.hState=false : this.hState=true
+        this.getClock()
+      },
       kitchenLight(){
         if (this.kState==true){
           this.kState = false
@@ -419,9 +416,18 @@
       },
       getClock(){
         let gettime = new Date()
+
+        if(this.hState == true){  // 12 표시
+          let h = gettime.getHours()
+          h = h>12? h-12:h
+          this.hour = h<10 ? `0${h}` : h
+        }
+        else{   // 24 표시
+          this.hour = gettime.getHours() <10 ? `0${gettime.getHours()}` : gettime.getHours()
+        }
         // this.hour = gettime.getHours()
         // this.min = gettime.getMinutes()
-        this.hour = gettime.getHours() <10 ? `0${gettime.getHours()}` : gettime.getHours()
+        // this.hour = gettime.getHours() <10 ? `0${gettime.getHours()}` : gettime.getHours()
         this.min = gettime.getMinutes()<10 ? `0${gettime.getMinutes()}` : gettime.getMinutes()
         // this.hour = this.hour<10 ? `0${this.hour}`:this.hour
         // this.min = this.min<10 ? `0${this.min}`:this.min
@@ -434,6 +440,7 @@
         // console.log(typeof(this.hour))
         this.clock.hour = this.hour
         this.clock.min = this.min
+        
       },
       callInterphone(){
         this.$mqtt.publish('iot/hong/interphone','1')
