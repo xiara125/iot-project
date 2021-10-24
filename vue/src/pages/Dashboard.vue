@@ -66,7 +66,7 @@
           <div class="row" style="margin-top:100px">
             <div class="col-4" style="height: 50px">
               <div class="myicon">
-                <span class="material-icons" style="font-size:60px">flash_off</span>
+                <span class="material-icons" style="font-size:60px" @click="lightOff()">flash_off</span>
               </div>
               
             </div>
@@ -202,7 +202,7 @@
   import Modal from '@/components/Modal';
   import Open from './Notifications/Open.vue';
   import Close from './Notifications/Close.vue';
-  import basic from './Notifications/basic.vue';
+  import LedOff from './Notifications/LedOff.vue';
 
 
   let now = new Date()
@@ -352,29 +352,28 @@
         this.hState==true ? this.hState=false : this.hState=true
         this.getClock()
       },
+      turnOffAll(){
+        this.$mqtt.publish('iot/hong/led','all')
+        this.kState=false
+        this.lState=false
+        this.bState=false
+        this.notifyVue('top','center',LedOff)
+      },
+      lightOff(){
+        setTimeout(this.turnOffAll,3000)
+      },
       kitchenLight(){
-        if (this.kState==true){
-          this.kState = false
-        }
-        else{
-          this.kState = true
-        }
+        this.kState = !this.kState
+        this.$mqtt.publish('iot/hong/led',`kitchen/${this.kState}`)
+        // console.log(`${this.kState}입니다`)
       },
       livingRoomLight(){
-        if (this.lState==true){
-          this.lState = false
-        }
-        else{
-          this.lState = true
-        }
+        this.lState = !this.lState
+        this.$mqtt.publish('iot/hong/led',`livingRoom/${this.lState}`)
       },
       bedRoomLight(){
-        if (this.bState==true){
-          this.bState = false
-        }
-        else{
-          this.bState = true
-        }
+        this.bState = !this.bState
+        this.$mqtt.publish('iot/hong/led',`bedRoom/${this.bState}`)
       },
       faceCap(){
         this.$mqtt.publish('iot/hong/face/capture','face1')
@@ -561,6 +560,19 @@
               this.notifyVue('top','center',Close)
             }
         },
+        'iot/led/#': function(value, topic) {
+            // console.log(topic.split('/'))
+            let aryTopic = topic.split('/')
+            if(aryTopic[2] == 'kitchen'){
+              value == '0'? this.kState = false : this.kState = true
+            }
+            if(aryTopic[2] == 'livingRoom'){
+              value == '0'? this.lState = false : this.lState = true
+            }
+            if(aryTopic[2] == 'bedRoom'){
+              value == '0'? this.bState = false : this.bState = true
+            }
+        },
         
     },
     mounted() {
@@ -578,7 +590,7 @@
       this.$mqtt.subscribe('iot/sensors/#')
       this.$mqtt.subscribe('iot/earthshake')
       this.$mqtt.subscribe('iot/face/check')
-      
+      this.$mqtt.subscribe('iot/led/#')
       
       
 
@@ -587,8 +599,11 @@
       }
 
       setInterval(this.getClock,1000)
-      setTimeout(this.callDHT,100)
+      // setTimeout(this.callDHT,100)
       setInterval(this.updateChart,3000)
+      this.callDHT()
+      this.$mqtt.publish('iot/hong/led','call')
+
     },
     unmounted() {
         // 구독 해제
