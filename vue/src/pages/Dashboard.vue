@@ -134,10 +134,10 @@
     <div>
       <img :src="streamurl" class="mjpeg" />
     </div>
-        <base-button @click="searchModalVisible=false">닫기</base-button>
-        <base-button @click="opendoor()">문 열기</base-button>
-        <base-button @click="closedoor()">문 닫기</base-button>
-        <base-button @click="faceCap()">얼굴 인식</base-button>
+        <base-button class="animation-on-hover" @click="opendoor()">문 열기</base-button>
+        <base-button class="animation-on-hover" @click="closedoor()">문 닫기</base-button>
+        <base-button class="animation-on-hover" @click="faceCap()">얼굴 인식</base-button>
+        <base-button class="animation-on-hover" @click="callInterphone()">인터폰</base-button>
     </modal>
 
     <modal :show.sync="speechToText"
@@ -376,7 +376,7 @@
         this.$mqtt.publish('iot/hong/led',`bedRoom/${this.bState}`)
       },
       faceCap(){
-        this.$mqtt.publish('iot/hong/face/capture','face1')
+        this.$mqtt.publish('iot/hong/face/capture','call')
       },
       timeCheck(time){
         // setTimeout(this.timeout,5000)
@@ -410,7 +410,7 @@
           horizontalAlign: horizontalAlign,
           verticalAlign: verticalAlign,
           type: this.type[color],
-          timeout: 0
+          timeout: 5000
         });
       },
       getClock(){
@@ -573,6 +573,15 @@
               value == '0'? this.bState = false : this.bState = true
             }
         },
+        'iot/hong/face/capture': function(value, topic) {
+            console.log(topic)
+            if(value == 'start'){
+              this.notifyVue('top','center',Start)
+            }
+            else if(value == 'end'){
+              this.notifyVue('top','center',End)
+            }
+        },
         
     },
     mounted() {
@@ -591,6 +600,7 @@
       this.$mqtt.subscribe('iot/earthshake')
       this.$mqtt.subscribe('iot/face/check')
       this.$mqtt.subscribe('iot/led/#')
+      this.$mqtt.subscribe('iot/hong/face/capture')
       
       
 
