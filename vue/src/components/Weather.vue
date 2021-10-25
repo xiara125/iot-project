@@ -54,71 +54,43 @@ export default {
         }
     },
     methods: {
-        getWeather(){
+        async getWeather(){
+            
             let lat = 37.5683
             let lon = 126.9778
             let exclude = 'hourly,minutely,alerts'
             let params = {lat,lon,exclude,APPID, lang,units}
 
-            let {data} =  axios.get(url,{params})
+            let {data} = await axios.get(url,{params})
             console.log(data)
 
-            // this.today ={
-            //     main: data.current.weather[0].description,
-            //     temp: data.current.temp,
-            //     humi: data.current.humidity,
-            //     windSpeed: data.current.wind_speed,
-            //     windDeg: data.current.wind_deg,
-            //     icon : `http://openweathermap.org/img/w/${data.current.weather[0].icon}.png`
-            // }
+            this.weather.today ={
+                main: data.current.weather[0].description,
+                temp: data.current.temp,
+                humi: data.current.humidity,
+                windSpeed: data.current.wind_speed,
+                windDeg: data.current.wind_deg,
+                icon : `http://openweathermap.org/img/w/${data.current.weather[0].icon}.png`
+            }
+            this.weather.tomorrow ={
+                main: data.daily[1].weather[0].description,
+                min_temp: data.daily[1].temp.min,
+                max_temp: data.daily[1].temp.max,
+                icon : `http://openweathermap.org/img/w/${data.daily[1].weather[0].icon}.png`
+            }
+            this.weather.da_tomorrow ={
+                main: data.daily[2].weather[0].description,
+                min_temp: data.daily[2].temp.min,
+                max_temp: data.daily[2].temp.max,
+                icon : `http://openweathermap.org/img/w/${data.daily[2].weather[0].icon}.png`
+            }
+            console.log(this.weather.today.temp)
         },
     },
     async mounted(){
-        // setInterval(this.getWeather,5000)
-
-        // let q = this.city
-        // let params = {q,APPID, lang,units}
+        setInterval(this.getWeather,10000)
+        this.getWeather()
         
-        let lat = 37.5683
-        let lon = 126.9778
-        let exclude = 'hourly,minutely,alerts'
-        let params = {lat,lon,exclude,APPID, lang,units}
-
-        let {data} = await axios.get(url,{params})
-        console.log(data)
-
-        // this.weather ={
-        //     main: data.weather[0].description,
-        //     temp: data.main.temp,
-        //     humi: data.main.humidity,
-        //     windSpeed: data.wind.speed,
-        //     windDeg: data.wind.deg
-        // }
-        
-        this.weather.today ={
-            main: data.current.weather[0].description,
-            temp: data.current.temp,
-            humi: data.current.humidity,
-            windSpeed: data.current.wind_speed,
-            windDeg: data.current.wind_deg,
-            icon : `http://openweathermap.org/img/w/${data.current.weather[0].icon}.png`
-        }
-        this.weather.tomorrow ={
-            main: data.daily[1].weather[0].description,
-            min_temp: data.daily[1].temp.min,
-            max_temp: data.daily[1].temp.max,
-            icon : `http://openweathermap.org/img/w/${data.daily[1].weather[0].icon}.png`
-        }
-        this.weather.da_tomorrow ={
-            main: data.daily[2].weather[0].description,
-            min_temp: data.daily[2].temp.min,
-            max_temp: data.daily[2].temp.max,
-            icon : `http://openweathermap.org/img/w/${data.daily[2].weather[0].icon}.png`
-        }
-        console.log(this.weather.today.temp)
-        
-        // this.icon = `http://openweathermap.org/img/w/${data.weather[0].icon}.png`
-        // this.icon = `http://openweathermap.org/img/w/${data.current.weather[0].icon}.png`
     }
 }
 </script>
