@@ -6,7 +6,7 @@ class KaKaoTalkForm(forms.Form):
     # CahrField -> input type="text" 와 같음
     text = forms.CharField(label='전송할 Talk', max_length=300)
     web_url = forms.CharField(label='Web URL', max_length=300,
-            initial='http://192.168.35.71:8000/mjpeg/?mode=stream')
+            initial='http://192.168.35.74:8000/mjpeg/?mode=stream')
     mobile_web_url = forms.CharField(label='Mobile Url', max_length=300,
             initial='http://192.168.35.71:8000/mjpeg/?mode=stream')
     

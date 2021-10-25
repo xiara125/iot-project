@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'kakao',
     'mqtt',
     'audiotest',
+    'face',
 ]
 
 MIDDLEWARE = [

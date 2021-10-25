@@ -2,6 +2,10 @@ import io
 import time
 import numpy as np
 from picamera import PiCamera, frames
+import cv2
+
+face_image = np.empty((640*480*3), dtype=np.uint8)
+face_image = face_image.reshape((480,640,3))
 
 class PiCam:
     def __init__(self, framerate=25, width=640, height=480):
@@ -26,9 +30,27 @@ class MJpegStreamCam(PiCam):
     
     def __iter__(self):
         frame = io.BytesIO()
+        # face_image = np.empty((640*480*3), dtype=np.uint8)
+        # print('이미지',face_image)
+        # print(face_image.shape)
+        
         while True:
             self.camera.capture(frame, format="jpeg",use_video_port=True)
+            # self.camera.capture(frame, format="bgr",use_video_port=True)
+            # print(frame)
+            
+            self.camera.capture(face_image, format="bgr",use_video_port=True)
+            
+            # print('face_image',face_image)
+            # face_image = face_image.reshape((480,640,3))
             image = frame.getvalue()
+
+            # face_image = face_image.reshape((480,640,3))
+            # print('얼굴이미지 배열',face_image)
+            # cv2.imshow('frame',face_image)
+            # if cv2.waitKey(1)==13:
+            #     break
+
             # generator 생성
             yield(b'--myboundary\n' # 경계선
                     b'Content-Type:image/jpeg\n'

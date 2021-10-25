@@ -44,3 +44,7 @@ def play_elevator():
     text = "엘리베이터가 도착했습니다"
     audio = synthesize(text)
     play_audio(audio)
+
+def tts(text):
+    audio = synthesize(text)
+    play_audio(audio)

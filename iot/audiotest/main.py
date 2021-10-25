@@ -9,11 +9,12 @@ import io
 from time import sleep
 import threading
 
-
+cmd = Cmd()
 button = Button(26)
 btn = Button(6)
-cmd = Cmd()
+door_btn = Button(18)
 
+door_state = False
 duration = 5
 
 
@@ -83,9 +84,22 @@ def mqttSTT(seconds=5, fs=16000, channels=1):
     recognize(audio)
 
 
+def door():
+    global door_state
+    if door_state:
+        cmd.open_door()
+        door_state = False
+    else:
+        cmd.close_door()
+        door_state = True
+
+
 button.when_pressed = record
 button.when_released = end_record
 btn.when_pressed = start
+door_btn.when_pressed = door
+
+
 
 
 

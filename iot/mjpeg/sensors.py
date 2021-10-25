@@ -1,4 +1,4 @@
-from gpiozero import MotionSensor, LED, Button
+# from gpiozero import MotionSensor, LED, Button
 from signal import pause
 import requests
 import json
@@ -7,8 +7,7 @@ import soundfile as sf
 import io
 
 
-pir = MotionSensor(12)
-led = LED(13)
+# pir = MotionSensor(12)
 
 
 def send_talk(message):
@@ -51,10 +50,8 @@ def send_talk(message):
 
 
 def detect():
-    led.on()
     # 카톡 메시지 보내기
     send_talk('침입 발생')
 
 
-pir.when_motion = detect
-pir.when_no_motion = led.off
+# pir.when_motion = detect

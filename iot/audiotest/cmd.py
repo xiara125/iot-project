@@ -25,20 +25,45 @@ class Cmd:
         self.servo = AngularServo(16,pin_factory=factory,
                     min_angle=-90, max_angle=90,
                     min_pulse_width=0.00045, max_pulse_width=0.0023)
-        self.led = LED(19)
+        self.k_led = LED(17)
+        self.l_led = LED(27)
+        self.b_led = LED(13)
         
 
     def open_door(self):
-        self.servo.angle = 90
+        self.servo.angle = 45
     
     def close_door(self):
-        self.servo.angle = 0
+        self.servo.angle = -45
 
-    def led_on(self):
-        self.led.on()
+    def led_on(self,place):
+        if place == 'k':
+            self.k_led.on()
+        elif place == 'l':
+            self.l_led.on()
+        elif place == 'b':
+            self.b_led.on()
 
-    def led_off(self):
-        self.led.off()
+    def led_off(self,place):
+        if place == 'k':
+            self.k_led.off()
+        elif place == 'l':
+            self.l_led.off()
+        elif place == 'b':
+            self.b_led.off()
+        elif place == 'a':
+            self.k_led.off()
+            self.l_led.off()
+            self.b_led.off()
+
+    def led_state(self):
+        print(self.k_led.value)
+        print(self.l_led.value)
+        print(self.b_led.value)
+        client.connect("192.168.35.129")
+        client.publish("iot/led/kitchen",self.k_led.value)
+        client.publish("iot/led/livingRoom",self.l_led.value)
+        client.publish("iot/led/bedRoom",self.b_led.value)
 
     def weather(self):
         ks.play_weather()
