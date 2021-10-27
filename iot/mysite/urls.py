@@ -19,6 +19,9 @@ from mysite import settings
 from django.conf.urls.static import static
 import mqtt.client
 import audiotest.main
+import face.FaceCheck
+import face.FaceCap
+
 
 
 urlpatterns = [
