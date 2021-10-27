@@ -20,8 +20,9 @@
         <card>
           <weather city="seoul" cityTitle="Seoul"></weather>
         </card>
-        <card>
-          <div v-for="(devices,place) in sensors" :key="place">
+
+        <card >
+          <div v-for="(devices,place) in sensors" :key="place" @click="sensorchart = true">
             <h3 style="color :rgba(85, 95, 126, 1);font-weight:bold">{{place}}</h3>
             <div class="row">  
               <div class="col-4"
@@ -85,15 +86,9 @@
             </div>
           </div>
           <div class="row" style="margin-top:100px">
-            <div class="col-4">
-              
-            </div>
-            <div class="col-4">
+            <div class="col-12">
               <div class="myicon">
               <i class="fas fa-microphone" @click="speechToText=true, timeCheck(6000),callSTT()"></i></div>
-            </div>
-            <div class="col-4">
-              
             </div>
           </div>
         </card>
@@ -101,12 +96,12 @@
     </div>
 
     
-    <div class="row">
+    <!-- <div class="row">
       <div class="col-lg-4" :class="{'text-right': isRTL}">
         <card type="chart">
           <template slot="header">
             <h5 class="card-category">{{$t('dashboard.completedTasks')}}</h5>
-            <h3 class="card-title"><i class="tim-icons icon-send text-success "></i> 12,100K</h3>
+            <h3 class="card-title"><i class="tim-icons icon-send text-success "></i> 센서 데이터</h3>
           </template>
           <div class="chart-area">
             <line-chart style="height: 100%"
@@ -118,11 +113,46 @@
           </div>
         </card>
       </div>
+    </div>  -->
+    <!-- <base-button @click="choiceChart = 'temp',showChart()">온도</base-button>
+    <base-button @click="choiceChart = 'humi',showChart() ">습도</base-button>
+    <base-button @click="choiceChart = 'illu',showChart() ">조도</base-button> -->
+    
+    <modal :show.sync="sensorchart" 
+      id="searchModal"
+      :centered="false"
+      :show-close="true">
+      <template slot="header">
+        <h3 class="modal-title">센서 데이터 모니터링</h3>
+      </template>
+
+      <!-- <h6 slot="header" class="modal-title" id="modal-title-default">Type your modal title</h6> -->
+    <div>
+      <card type="chart">
+          <template slot="header">
+            <h4 class="card-title" v-if="choiceChart=='illu'" >조도</h4>
+            <h4 class="card-title" v-if="choiceChart=='temp'" >온도</h4>
+            <h4 class="card-title" v-if="choiceChart=='humi'" >습도</h4>
+            <!-- <h3 class="card-title"><i class="tim-icons icon-send text-success "></i> 센서 데이터</h3> -->
+          </template>
+          <div class="chart-area">
+            <line-chart style="height: 100%"
+                        chart-id="green-line-chart"
+                        :chart-data="greenLineChart.chartData"
+                        :gradient-stops="greenLineChart.gradientStops"
+                        :extra-options="greenLineChart.extraOptions">
+            </line-chart>
+          </div>
+        </card>
+
     </div>
-    
-    
-    <modal :show.sync="searchModalVisible"
-      
+        <base-button @click="choiceChart = 'temp',showChart()">온도</base-button>
+      <base-button @click="choiceChart = 'humi',showChart() ">습도</base-button>
+      <base-button @click="choiceChart = 'illu',showChart() ">조도</base-button>
+    </modal>
+
+
+    <modal :show.sync="searchModalVisible" 
       id="searchModal"
       :centered="false"
       :show-close="true">
@@ -136,8 +166,9 @@
     </div>
         <base-button class="animation-on-hover" @click="opendoor()">문 열기</base-button>
         <base-button class="animation-on-hover" @click="closedoor()">문 닫기</base-button>
-        <base-button class="animation-on-hover" @click="faceCap()">얼굴 인식</base-button>
         <base-button class="animation-on-hover" @click="callInterphone()">인터폰</base-button>
+        <base-button class="animation-on-hover" @click="faceCap()">얼굴 인식</base-button>
+        <span>  {{capPercent}}</span>
     </modal>
 
     <modal :show.sync="speechToText"
@@ -153,38 +184,6 @@
         음성인식 중
       </div>
     </modal>
-    
-    <!-- <div class="row">
-      <div class="col-lg-6 col-md-12">
-        <card type="tasks" :header-classes="{'text-right': isRTL}">
-          <template slot="header">
-            <h6 class="title d-inline">{{$t('dashboard.tasks', {count: 5})}}</h6>
-            <p class="card-category d-inline">{{$t('dashboard.today')}}</p>
-            <base-dropdown menu-on-right=""
-                           tag="div"
-                           title-classes="btn btn-link btn-icon"
-                           aria-label="Settings menu"
-                           :class="{'float-left': isRTL}">
-              <i slot="title" class="tim-icons icon-settings-gear-63"></i>
-              <a class="dropdown-item" href="#pablo">{{$t('dashboard.dropdown.action')}}</a>
-              <a class="dropdown-item" href="#pablo">{{$t('dashboard.dropdown.anotherAction')}}</a>
-              <a class="dropdown-item" href="#pablo">{{$t('dashboard.dropdown.somethingElse')}}</a>
-            </base-dropdown>
-          </template>
-          <div class="table-full-width table-responsive">
-            <task-list></task-list>
-          </div>
-        </card>
-      </div>
-      <div class="col-lg-6 col-md-12">
-        <card class="card" :header-classes="{'text-right': isRTL}">
-          <h4 slot="header" class="card-title">{{$t('dashboard.simpleTable')}}</h4>
-          <div class="table-responsive">
-            <user-table></user-table>
-          </div>
-        </card>
-      </div>
-    </div> -->
   </div>
 </template>
 <script>
@@ -221,6 +220,7 @@
     },
     data() {
       return {
+        capPercent:'',
         hState:false,   // 시간 표시 상태
         kState:false,   // kitchen led on/off
         lState:false,   // livingRoom led on/off
@@ -229,12 +229,19 @@
         speechToText: false,
         activeNotifications: false,
         showMenu: false,
+        sensorchart : false,
         searchModalVisible: false,
         searchQuery: '',
         type: ["", "info", "success", "warning", "danger"],
         notifications: {
           topCenter: false
         },
+        thLabal:['-80s', '-60s', '-40s', '-20s', 'now'],
+        illuLabel:['-12s', '-9s', '-6s', '-3s', 'now'],
+        illuCount:0,
+        choiceChart:'illu',
+        aryillu:[],
+        aryhumi:[],
         arytemp:[],
         elevator:{
           floor:'',
@@ -251,52 +258,52 @@
           //   // 'illu': '',
           // },
         },
-        bigLineChart: {
-          allData: [
-            [100, 70, 90, 70, 85, 60, 75, 60, 90, 80, 110, 100],
-            [80, 120, 105, 110, 95, 105, 90, 100, 80, 95, 70, 120],
-            [60, 80, 65, 130, 80, 105, 90, 130, 70, 115, 60, 130]
-          ],
-          activeIndex: 0,
-          chartData: {
-            datasets: [{ }],
-            labels: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
-          },
-          extraOptions: chartConfigs.purpleChartOptions,
-          gradientColors: config.colors.primaryGradient,
-          gradientStops: [1, 0.4, 0],
-          categories: []
-        },
-        purpleLineChart: {
-          extraOptions: chartConfigs.purpleChartOptions,
-          chartData: {
-            labels: ['JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
-            datasets: [{
-              label: "Data",
-              fill: true,
-              borderColor: config.colors.primary,
-              borderWidth: 2,
-              borderDash: [],
-              borderDashOffset: 0.0,
-              pointBackgroundColor: config.colors.primary,
-              pointBorderColor: 'rgba(255,255,255,0)',
-              pointHoverBackgroundColor: config.colors.primary,
-              pointBorderWidth: 20,
-              pointHoverRadius: 4,
-              pointHoverBorderWidth: 15,
-              pointRadius: 4,
-              data: [80, 100, 70, 80, 120, 80],
-            }]
-          },
-          gradientColors: config.colors.primaryGradient,
-          gradientStops: [1, 0.2, 0],
-        },
+        // bigLineChart: {
+        //   allData: [
+        //     [100, 70, 90, 70, 85, 60, 75, 60, 90, 80, 110, 100],
+        //     [80, 120, 105, 110, 95, 105, 90, 100, 80, 95, 70, 120],
+        //     [60, 80, 65, 130, 80, 105, 90, 130, 70, 115, 60, 130]
+        //   ],
+        //   activeIndex: 0,
+        //   chartData: {
+        //     datasets: [{ }],
+        //     labels: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
+        //   },
+        //   extraOptions: chartConfigs.purpleChartOptions,
+        //   gradientColors: config.colors.primaryGradient,
+        //   gradientStops: [1, 0.4, 0],
+        //   categories: []
+        // },
+        // purpleLineChart: {
+        //   extraOptions: chartConfigs.purpleChartOptions,
+        //   chartData: {
+        //     labels: ['JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
+        //     datasets: [{
+        //       label: "Data",
+        //       fill: true,
+        //       borderColor: config.colors.primary,
+        //       borderWidth: 2,
+        //       borderDash: [],
+        //       borderDashOffset: 0.0,
+        //       pointBackgroundColor: config.colors.primary,
+        //       pointBorderColor: 'rgba(255,255,255,0)',
+        //       pointHoverBackgroundColor: config.colors.primary,
+        //       pointBorderWidth: 20,
+        //       pointHoverRadius: 4,
+        //       pointHoverBorderWidth: 15,
+        //       pointRadius: 4,
+        //       data: [80, 100, 70, 80, 120, 80],
+        //     }]
+        //   },
+        //   gradientColors: config.colors.primaryGradient,
+        //   gradientStops: [1, 0.2, 0],
+        // },
         greenLineChart: {
           extraOptions: chartConfigs.greenChartOptions,
           chartData: {
-            labels: ['JUL', 'AUG', 'SEP', 'OCT', 'NOV'],
+            labels: [],
             datasets: [{
-              label: "My First dataset",
+              
               fill: true,
               borderColor: config.colors.danger,
               borderWidth: 2,
@@ -309,30 +316,29 @@
               pointHoverRadius: 4,
               pointHoverBorderWidth: 15,
               pointRadius: 4,
-              // data: this.arytemp,
-              data: [],
+              data:[]
             }]
           },
           gradientColors: ['rgba(66,134,121,0.15)', 'rgba(66,134,121,0.0)', 'rgba(66,134,121,0)'],
           gradientStops: [1, 0.4, 0],
         },
-        blueBarChart: {
-          extraOptions: chartConfigs.barChartOptions,
-          chartData: {
-            labels: ['USA', 'GER', 'AUS', 'UK', 'RO', 'BR'],
-            datasets: [{
-              label: "Countries",
-              fill: true,
-              borderColor: config.colors.info,
-              borderWidth: 2,
-              borderDash: [],
-              borderDashOffset: 0.0,
-              data: [53, 20, 10, 80, 100, 45],
-            }]
-          },
-          gradientColors: config.colors.primaryGradient,
-          gradientStops: [1, 0.4, 0],
-        }
+        // blueBarChart: {
+        //   extraOptions: chartConfigs.barChartOptions,
+        //   chartData: {
+        //     labels: ['USA', 'GER', 'AUS', 'UK', 'RO', 'BR'],
+        //     datasets: [{
+        //       label: "Countries",
+        //       fill: true,
+        //       borderColor: config.colors.info,
+        //       borderWidth: 2,
+        //       borderDash: [],
+        //       borderDashOffset: 0.0,
+        //       data: [53, 20, 10, 80, 100, 45],
+        //     }]
+        //   },
+        //   gradientColors: config.colors.primaryGradient,
+        //   gradientStops: [1, 0.4, 0],
+        // }
       }
     },
     computed: {
@@ -348,6 +354,43 @@
       
     },
     methods: {
+      getRandomInt() {
+        return Math.floor(Math.random() * (50 - 4)) + 5;
+      },
+      
+      showChart(){
+        if(this.choiceChart == 'illu'){
+          this.updateChart(this.aryillu,this.illuLabel)
+        }
+        else if(this.choiceChart == 'humi'){
+          this.updateChart(this.aryhumi,this.thLabal)
+        }
+        else{
+          this.updateChart(this.arytemp,this.thLabal)
+        }
+      },
+      updateChart(arydata,arylabel){
+        let chartData ={
+          labels: arylabel,
+          datasets:[{
+            
+            fill: true,
+            borderColor: config.colors.danger,
+            borderWidth: 2,
+            borderDash: [],
+            borderDashOffset: 0.0,
+            pointBackgroundColor: config.colors.danger,
+            pointBorderColor: 'rgba(255,255,255,0)',
+            pointHoverBackgroundColor: config.colors.danger,
+            pointBorderWidth: 20,
+            pointHoverRadius: 4,
+            pointHoverBorderWidth: 15,
+            pointRadius: 4,
+            data:arydata,
+          }]
+        }
+        this.greenLineChart.chartData = chartData
+      },
       hourState(){
         this.hState==true ? this.hState=false : this.hState=true
         this.getClock()
@@ -395,13 +438,6 @@
       closedoor(){
         this.$mqtt.publish('iot/hong/door','close')
       },
-      updateChart(){
-        // this.greenLineChart.chartData.datasets[0].data = this.arytemp.slice(0,5)
-        // console.log(this.greenLineChart.chartData.datasets[0].data)
-        // console.log(this.arytemp.slice(0,5))
-        // this.greenLineChart.chartData.datasets[0].data.push(10)
-
-      },
       notifyVue(verticalAlign, horizontalAlign,component) {
         const color = Math.floor(Math.random() * 4 + 1);
         this.$notify({
@@ -424,19 +460,9 @@
         else{   // 24 표시
           this.hour = gettime.getHours() <10 ? `0${gettime.getHours()}` : gettime.getHours()
         }
-        // this.hour = gettime.getHours()
-        // this.min = gettime.getMinutes()
-        // this.hour = gettime.getHours() <10 ? `0${gettime.getHours()}` : gettime.getHours()
+        
         this.min = gettime.getMinutes()<10 ? `0${gettime.getMinutes()}` : gettime.getMinutes()
-        // this.hour = this.hour<10 ? `0${this.hour}`:this.hour
-        // this.min = this.min<10 ? `0${this.min}`:this.min
-        // if (this.min<10){
-        //   this.min = `0${this.min}`
-        //   // console.log(this.min)
-        // }
-        // console.log('현재시간')
-        // console.log(this.hour,this.min)
-        // console.log(typeof(this.hour))
+        
         this.clock.hour = this.hour
         this.clock.min = this.min
         
@@ -445,6 +471,10 @@
         this.$mqtt.publish('iot/hong/interphone','1')
         console.log()
         this.notifyVue('top','center',Start)
+      },
+      showElevator(){
+        this.$mqtt.publish('iot/hong/control/elevator','s')
+        console.log()
       },
       callElevator(){
         this.$mqtt.publish('iot/hong/control/elevator','5')
@@ -462,29 +492,29 @@
       toggleSidebar() {
         this.$sidebar.displaySidebar(!this.$sidebar.showSidebar);
       },
-      initBigChart(index) {
-        let chartData = {
-          datasets: [{
-            fill: true,
-            borderColor: config.colors.primary,
-            borderWidth: 2,
-            borderDash: [],
-            borderDashOffset: 0.0,
-            pointBackgroundColor: config.colors.primary,
-            pointBorderColor: 'rgba(255,255,255,0)',
-            pointHoverBackgroundColor: config.colors.primary,
-            pointBorderWidth: 20,
-            pointHoverRadius: 4,
-            pointHoverBorderWidth: 15,
-            pointRadius: 4,
-            data: this.bigLineChart.allData[index]
-          }],
-          labels: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
-        }
-        // this.$refs.bigChart.updateGradients(chartData);
-        this.bigLineChart.chartData = chartData;
-        this.bigLineChart.activeIndex = index;
-      },
+      // initBigChart(index) {
+      //   let chartData = {
+      //     datasets: [{
+      //       fill: true,
+      //       borderColor: config.colors.primary,
+      //       borderWidth: 2,
+      //       borderDash: [],
+      //       borderDashOffset: 0.0,
+      //       pointBackgroundColor: config.colors.primary,
+      //       pointBorderColor: 'rgba(255,255,255,0)',
+      //       pointHoverBackgroundColor: config.colors.primary,
+      //       pointBorderWidth: 20,
+      //       pointHoverRadius: 4,
+      //       pointHoverBorderWidth: 15,
+      //       pointRadius: 4,
+      //       data: this.bigLineChart.allData[index]
+      //     }],
+      //     labels: ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
+      //   }
+      //   // this.$refs.bigChart.updateGradients(chartData);
+      //   this.bigLineChart.chartData = chartData;
+      //   this.bigLineChart.activeIndex = index;
+      // },
     },
     mqtt: {
         'iot/hong/floor/elevator': function(value,topic) {
@@ -531,17 +561,47 @@
               else{
                 this.arytemp.push(this.sensors[place].temp-'0')
               }
-
-              // this.arytemp.push(this.sensors[place].temp-'0')
-              // console.log(this.arytemp.length)
-              // console.log(this.arytemp)
-              // this.greenLineChart.chartData.datasets.data = this.arytemp.slice(0,5)
-
-              // console.log(this.greenLineChart.chartData.datasets[0].data)
-              // console.log('온도데이터',this.arytemp.slice(0,5))
-              this.greenLineChart.chartData.datasets[0].data.push(this.sensors[place].temp-'0')
               
             }
+            else if(device == 'humi'){
+              if(this.aryhumi.length ==5){
+                this.aryhumi.shift()
+                this.aryhumi.push(this.sensors[place].humi-'0')  
+              }
+              else{
+                this.aryhumi.push(this.sensors[place].humi-'0')
+              }
+            }
+            else if(device == 'illu'){
+              if(this.illuCount == 3){
+                this.illuCount = 0
+                if(this.aryillu.length ==5){
+                  this.aryillu.shift()
+                  this.aryillu.push(this.sensors[place].illu-'0')  
+                }
+                else{
+                  this.aryillu.push(this.sensors[place].illu-'0')
+                }
+              }
+              
+              this.illuCount += 1 
+            }
+
+            if(this.choiceChart == 'temp'){
+                this.updateChart(this.arytemp,this.thLabal)
+              }
+            else if(this.choiceChart == 'humi'){
+              this.updateChart(this.aryhumi,this.thLabal)
+            }
+            else if(this.choiceChart == 'illu'){
+              this.updateChart(this.aryillu,this.illuLabel)
+            }
+
+
+            // console.log('조도센서 :',this.aryillu)
+            // console.log('온도센서 :',this.arytemp)
+            // console.log('습도센서 :',this.aryhumi)
+            // console.log('choicechart :',this.choiceChart)
         },
         'iot/earthshake': function(value, topic) {
             if (value == 1){
@@ -574,24 +634,47 @@
             }
         },
         'iot/hong/face/capture': function(value, topic) {
-            console.log(topic)
+            // console.log(topic)
             if(value == 'start'){
               this.notifyVue('top','center',Start)
+              // this.capPercent = '0'
+              this.capPercent = '□□□□□□□□'
             }
             else if(value == 'end'){
               this.notifyVue('top','center',End)
+              this.capPercent = ''
             }
+            else if(value == '25'){
+              // console.log('25')
+              // this.capPercent = value
+              this.capPercent = '■■□□□□□□'
+            }
+            else if(value == '50'){
+              // console.log('50')
+              // this.capPercent = value
+              this.capPercent = '■■■■□□□□'
+            }
+            else if(value == '75'){
+              // console.log('75')
+              // this.capPercent = value
+              this.capPercent = '■■■■■■□□'
+            }
+            console.log(value-'0')
         },
         
     },
     mounted() {
+      // this.showElevator()
+      // this.fillData()      
       this.i18n = this.$i18n;
       if (this.enableRTL) {
         this.i18n.locale = 'ar';
         this.$rtl.enableRTL();
       }
-      this.initBigChart(0);
+      // this.initBigChart(0);
       
+      // setInterval(this.showChart,500)
+    
       // 구독 신청
       this.$mqtt.subscribe('iot/hong/floor/elevator')
       this.$mqtt.subscribe('iot/hong/arrive/elevator')
@@ -610,7 +693,7 @@
 
       setInterval(this.getClock,1000)
       // setTimeout(this.callDHT,100)
-      setInterval(this.updateChart,3000)
+      // setInterval(,5000)
       this.callDHT()
       this.$mqtt.publish('iot/hong/led','call')
 

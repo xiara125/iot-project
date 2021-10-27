@@ -30,7 +30,8 @@
 <script>
 import axios from 'axios'
 
-const APPID = "09e55b3c6482eb81e2895a05b3a8e338"
+// const APPID = "09e55b3c6482eb81e2895a05b3a8e338"
+const APPID = "843974b249175f62a6ff9e367cceb36a"
 // const url = "http://api.openweathermap.org/data/2.5/weather"
 const url = "http://api.openweathermap.org/data/2.5/onecall"
 const units = 'metric'
@@ -62,7 +63,7 @@ export default {
             let params = {lat,lon,exclude,APPID, lang,units}
 
             let {data} = await axios.get(url,{params})
-            console.log(data)
+            // console.log(data)
 
             this.weather.today ={
                 main: data.current.weather[0].description,
@@ -84,11 +85,11 @@ export default {
                 max_temp: data.daily[2].temp.max,
                 icon : `http://openweathermap.org/img/w/${data.daily[2].weather[0].icon}.png`
             }
-            console.log(this.weather.today.temp)
+            // console.log(this.weather.today.temp)
         },
     },
     async mounted(){
-        setInterval(this.getWeather,10000)
+        setInterval(this.getWeather,3600000)
         this.getWeather()
         
     }
