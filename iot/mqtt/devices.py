@@ -79,8 +79,13 @@ add_topic_handler('door',openDoor)
 
 
 def face_capture(topic, value):
-    
-    startFaceCap(value)
+    if value == 'call':
+        interphone.connect("192.168.35.129")
+        interphone.publish("iot/hong/face/capture",'start')
+        print('얼굴인식 시작')
+        startFaceCap()
+        interphone.publish("iot/hong/face/capture",'end')
+        print('얼굴인식 종료')
         
 add_topic_handler('face/capture',face_capture)
 

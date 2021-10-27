@@ -1,8 +1,10 @@
 import cv2
 import numpy as np
-from os import makedirs
+from os import makedirs, listdir
 from os.path import isdir
 from mysite.picam import face_image
+from audiotest.cmd import client
+
 
 face_state = 1
 
@@ -36,7 +38,7 @@ def take_pictures(name):
     # cap = cv2.VideoCapture('http://192.168.35.71:8000/mjpeg/stream/')
     count = 0
     global face_state
-    
+    client.connect("192.168.35.129")
 
     while True:
         #카메라로 부터 사진 한장 읽어오기
@@ -47,6 +49,14 @@ def take_pictures(name):
 
         if face_img is not None:
             count+=1
+            
+            if count == 25:
+                client.publish("iot/hong/face/capture",str(count))
+            elif count == 50:
+                client.publish("iot/hong/face/capture",str(count))
+            elif count == 75:
+                client.publish("iot/hong/face/capture",str(count))
+
             #200x200 사이즈를 줄이거나 늘린다
             face = cv2.resize(face_img,(200,200))
             face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
@@ -57,8 +67,8 @@ def take_pictures(name):
             cv2.putText(face,str(count),(50,50),cv2.FONT_HERSHEY_COMPLEX,1,(0,255,0),2)
             cv2.imshow('Face Cropper', face)
         else:
-            print("Face not Found")
-            # pass
+            # print("Face not Found")
+            pass
 
         #얼굴 사진 100장을 다 얻엇거나 엔터키 누르면 종료
         if cv2.waitKey(1)==13 or count==100:
@@ -82,7 +92,14 @@ def change_face_state():
 #     # 사진 저장할 이름을 넣어서 함수 호출
 #     take_pictures('LeeDongHae')
 
-def startFaceCap(name):
-    take_pictures(name)
+def startFaceCap():
+    file_list = sorted([f for f in listdir(face_dirs) if 'face' in f])
+    # print(int(file_list[-1][-1]),type(int(file_list[-1][-1])))
+    if file_list:
+        file_name = f'face{int(file_list[-1][-1])+1}'
+    else:
+        file_name = 'face1'
+
+    take_pictures(file_name)
     
 

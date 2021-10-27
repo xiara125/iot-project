@@ -80,7 +80,7 @@ def run(models):
         image, face = face_detector(face_image)
 
         from .FaceCap import face_state
-        print(face_state)
+        # print(face_state)
 
 
         try:
@@ -118,8 +118,8 @@ def run(models):
             print('카메라종료')
             
             break
-            # cv2.destroyAllWindows()
-            return
+            # # cv2.destroyAllWindows()
+            # return
     # face_image.release()
     cv2.destroyAllWindows()
     

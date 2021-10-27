@@ -5,6 +5,9 @@ from audiotest import kakaoSound as ks
 import paho.mqtt.client as mqtt
 import spidev
 from mysite.picam import face_image
+from mjpeg.sensors import send_talk
+
+
 
 print('테스트',face_image)
 
@@ -23,9 +26,11 @@ def earthshake():
 
         if pre_data == 0 and now_data == 1:
             print('지진 발생')
+            send_talk('지진 발생')
             es.connect("192.168.35.129")
             es.publish('iot/earthshake',1)
             ks.tts('지진 발생!!')
+            send_talk('지진 발생')
 
             
 
