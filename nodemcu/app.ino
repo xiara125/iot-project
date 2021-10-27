@@ -6,9 +6,9 @@
 #include <Led.h>
 #include <Segment7.h>
 
-const char *ssid = "SK_WiFiGIGAE247";
-const char *password ="1707027087";
-const char *mqtt_server ="192.168.35.129";
+const char *ssid = "";
+const char *password ="";
+const char *mqtt_server ="";
 
 MqttCom com;
 DHT dht11(D1, DHT11);
